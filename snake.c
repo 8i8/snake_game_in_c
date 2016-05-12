@@ -5,25 +5,23 @@
  *
  */
 
+#define _BSD_SOURCE	// Fix for usleep
 //#include <iostream>
 #include <curses.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <time.h>
 
-using namespace std;
-
 static WINDOW* gameWin;
-static bool gameOver;
-bool imortal;
-int width;
-int height;
-int x, y, fruitX, fruitY, score;
-int tailX[100], tailY[100];
-int nTail;
-int speedDelay;
-enum eDirection { STOP = 0, LEFT, RIGHT, UP, DOWN };
-eDirection dir;
+static int gameOver;
+static int imortal;
+static int width;
+static int height;
+static int x, y, fruitX, fruitY, score;
+static int tailX[100], tailY[100];
+static int nTail;
+static int speedDelay;
+static char dir;
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
  *  Setup
@@ -53,13 +51,13 @@ void SetupCurses()
 	gameWin = newwin(height, width, 0, 0);
 	keypad(stdscr, true);		// Use advanced keyboard functionality.
 	gameMode();
-	imortal = false;
+	imortal = 0;
 }
 
 void Start()
 {
 	speedDelay = 100000;
-	dir = STOP;
+	dir = 'S';
 	x = width / 2;
 	y = height / 2;
 	srand(time(NULL));
@@ -117,10 +115,10 @@ void Draw()
 
 void superpower()
 {
-	if (imortal == false)
-		imortal = true;
+	if (imortal == 0)
+		imortal = 1;
 	else
-		imortal = false;
+		imortal = 0;
 }
 
 void keys(int* c)
@@ -148,34 +146,34 @@ void Input()
 	switch (c) {
 
 	case 1:
-		if (dir == RIGHT)
+		if (dir == 'R')
 			break;
 
-		dir = LEFT;
+		dir = 'L';
 		break;
 	case 2:
-		if (dir == UP)
+		if (dir == 'U')
 			break;
 
-		dir = DOWN;
+		dir = 'D';
 		break;
 	case 3:
-		if (dir == DOWN)
+		if (dir == 'D')
 			break;
 
-		dir = UP;
+		dir = 'U';
 		break;
 	case 4:
-		if (dir == LEFT)
+		if (dir == 'L')
 			break;
 
-		dir = RIGHT;
+		dir = 'R';
 		break;
 	case 5:
-		if (imortal == true)
+		if (imortal == 1)
 			superpower();
 
-		gameOver = true;
+		gameOver = 1;
 		break;
 	case 6:
 		superpower();
@@ -198,13 +196,13 @@ void fruity()
 
 void endGame()
 {
-	if (imortal == true)
+	if (imortal == 1)
 	{
 		x = width/2;
 		y = height/2;
 	}
 	else
-		gameOver = true;
+		gameOver = 1;
 }
 
 void Logic()
@@ -240,16 +238,16 @@ void Logic()
 
 	switch (dir)
 	{
-		case LEFT:
+		case 'L':
 			x--;
 			break;
-		case RIGHT:
+		case 'R':
 			x++;
 			break;
-		case UP:
+		case 'U':
 			y--;
 			break;
-		case DOWN:
+		case 'D':
 			y++;
 			break;
 		default:
@@ -303,9 +301,9 @@ void Logic()
 
 void Play()
 {
-	gameOver = false;
+	gameOver = 0;
 
-	while (!gameOver) {
+	while (gameOver == 0) {
 
 		Draw();
 		Input();
