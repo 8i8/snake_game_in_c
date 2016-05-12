@@ -1,4 +1,5 @@
 *.vim
 tags
 a.out
-
+*.swp
+*.swo
