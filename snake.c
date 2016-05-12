@@ -322,14 +322,14 @@ void Menu()
 	
 	werase(gameWin);
 	erase();
-	mvprintw((height/2)-2, (width/2)-12,
+	mvprintw((height/2)-2, (width/2)-16,
 			"Welcome to Snake Dungeons");
-	mvprintw((height/2), (width/2)-12,
+	mvprintw((height/2), (width/2)-16,
 			"Enter at your own peril ...");
 	wrefresh(stdscr);
 	usleep(1200000);
-	mvprintw((height/2+2), (width/2)-12,
-			"Press 's' to begin, or 'q' to quit.");
+	mvprintw((height/2+2), (width/2)-16,
+			"Press 's' to begin, or to run away use 'q'.");
 	refresh();
 
 	int c = 'm';
