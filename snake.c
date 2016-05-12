@@ -1,12 +1,9 @@
 /*
  * Snake game
- *
- * Inspiration: https://www.youtube.com/watch?v=PSoLD9mVXTA
- *
  */
 
 #define _BSD_SOURCE	// Fix for usleep
-//#include <iostream>
+
 #include <curses.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -35,11 +32,11 @@ void gameMode()
 	nodelay(stdscr, true);		// Do not wait for getch()
 }
 
-void cursorMode()
+void menuMode()
 {
-	echo();				// Show typing.
-	nocbreak();			// Return to cooked mode.
-	curs_set(true);			// Show cursor.
+	//echo();				// Show typing.
+	//nocbreak();			// Return to cooked mode.
+	//curs_set(true);			// Show cursor.
 	nodelay(stdscr, false);		// Pause for getch()
 }
 
@@ -56,6 +53,7 @@ void SetupCurses()
 
 void Start()
 {
+	gameMode();
 	speedDelay = 100000;
 	dir = 'S';
 	x = width / 2;
@@ -139,43 +137,41 @@ void keys(int* c)
 
 void Input()
 {
-	int c = getch();
-	int* pC = &c;
-	keys(pC);
+	int c;
 	
 	switch (c) {
 
-	case 1:
+	case ('h' || KEY_LEFT || 'a'):
 		if (dir == 'R')
 			break;
 
 		dir = 'L';
 		break;
-	case 2:
+	case ('j' || KEY_DOWN || 's'):
 		if (dir == 'U')
 			break;
 
 		dir = 'D';
 		break;
-	case 3:
+	case ('k' || KEY_UP || 'w'):
 		if (dir == 'D')
 			break;
 
 		dir = 'U';
 		break;
-	case 4:
+	case ('l' || KEY_RIGHT || 'd'):
 		if (dir == 'L')
 			break;
 
 		dir = 'R';
 		break;
-	case 5:
+	case 'x':
 		if (imortal == 1)
 			superpower();
 
 		gameOver = 1;
 		break;
-	case 6:
+	case 'i':
 		superpower();
 		break;
 	}
@@ -320,24 +316,10 @@ void Exit()
 	endwin();
 }
 
-void switchVar(int* c)
-{
-	while (*c != 1 || *c != 5) {
-		nodelay(stdscr, true);
-
-		if (*c == 'y') 
-			*c = 1;
-
-		else if (*c == 'n') 
-			*c = 5;
-		else 
-			*c = getch();
-	}
-	nodelay(stdscr, false);
-}
-
 void Menu()
 {
+	
+	menuMode();
 	werase(gameWin);
 	erase();
 	mvprintw((height/2)-2, (width/2)-12,
