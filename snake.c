@@ -34,9 +34,9 @@ void gameMode()
 
 void menuMode()
 {
-	//echo();				// Show typing.
+	//echo();			// Show typing.
 	//nocbreak();			// Return to cooked mode.
-	//curs_set(true);			// Show cursor.
+	//curs_set(true);		// Show cursor.
 	nodelay(stdscr, false);		// Pause for getch()
 }
 
@@ -48,12 +48,13 @@ void SetupCurses()
 	gameWin = newwin(height, width, 0, 0);
 	keypad(stdscr, true);		// Use advanced keyboard functionality.
 	gameMode();
-	imortal = 0;
 }
 
 void Start()
 {
 	gameMode();
+	imortal = 0;
+	gameOver = 0;
 	speedDelay = 100000;
 	dir = 'S';
 	x = width / 2;
@@ -102,6 +103,7 @@ void Draw()
 	/*
 	 * Set the score
 	 */
+
 	mvprintw(height, 2, "Score: %d", score);
 	wrefresh(gameWin);
 	refresh();
@@ -137,41 +139,37 @@ void keys(int* c)
 
 void Input()
 {
-	int c;
-	
+	int c = getch();
+	keys(&c);
+
 	switch (c) {
 
-	case ('h' || KEY_LEFT || 'a'):
+	case 1:
 		if (dir == 'R')
 			break;
-
 		dir = 'L';
 		break;
-	case ('j' || KEY_DOWN || 's'):
+	case 2:
 		if (dir == 'U')
 			break;
-
 		dir = 'D';
 		break;
-	case ('k' || KEY_UP || 'w'):
+	case 3:
 		if (dir == 'D')
 			break;
-
 		dir = 'U';
 		break;
-	case ('l' || KEY_RIGHT || 'd'):
+	case 4:
 		if (dir == 'L')
 			break;
-
 		dir = 'R';
 		break;
-	case 'x':
+	case 5:
 		if (imortal == 1)
 			superpower();
-
 		gameOver = 1;
 		break;
-	case 'i':
+	case 6:
 		superpower();
 		break;
 	}
@@ -192,13 +190,16 @@ void fruity()
 
 void endGame()
 {
-	if (imortal == 1)
-	{
+	if (imortal == 1) {
 		x = width/2;
 		y = height/2;
-	}
-	else
+	} else {
 		gameOver = 1;
+		//for (int i = 0; i <= nTail; i++) {
+		//	tailY[i] = -1;
+		//	tailX[i] = -1;
+		//}
+	}
 }
 
 void Logic()
@@ -214,12 +215,12 @@ void Logic()
 	tailX[0] = x;
 	tailY[0] = y;
 
-	if (nTail > 1) {
-		move(tailY[nTail-1],tailX[nTail-1]);
-		addch(' ');
-	}
+	//if (nTail > 1) {
+	//	mvwaddch(gameWin, tailY[nTail-1], tailX[nTail-1], ' ');
+	//}
 
 	for (int i = 1; i < nTail; i++) {
+
 		prev2X = tailX[i];
 		prev2Y = tailY[i];
 		tailX[i] = prevX;
@@ -319,7 +320,6 @@ void Exit()
 void Menu()
 {
 	
-	menuMode();
 	werase(gameWin);
 	erase();
 	mvprintw((height/2)-2, (width/2)-12,
@@ -346,6 +346,7 @@ void Menu()
 			Play();
 			c = 'o';
 		case 'o':
+			gameOver = 0;
 			mvprintw(height/2, (width/2)-4,
 					"Game over!");
 			refresh();
@@ -354,6 +355,8 @@ void Menu()
 					"Would you like to play again?");
 			mvprintw((height/2)+1, (width/2)-17,
 					"Press 's' to start or 'q' to quit.");
+			mvprintw((height/2)+2, (width/2)-17, 
+					">>> %d", gameOver);
 			refresh();
 			break;
 		default:
