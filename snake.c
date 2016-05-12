@@ -26,9 +26,9 @@ static char dir;
 
 void gameMode()
 {
-	noecho();			// Hide typeing.
+	noecho();			// Hide typing.
 	cbreak();			// disable line buffering.
-	curs_set(false);		// No visable cursor.
+	curs_set(false);		// No visible cursor.
 	nodelay(stdscr, true);		// Do not wait for getch()
 }
 
@@ -175,6 +175,10 @@ void Input()
 	}
 }
 
+/*
+ * Add to score and replace fruit.
+ */
+
 void fruity()
 {
 	score += 10;
@@ -188,18 +192,17 @@ void fruity()
 		speedDelay = speedDelay - 3000;
 }
 
+/*
+ * An endgame with a get-out clause.
+ */
+
 void endGame()
 {
 	if (imortal == 1) {
 		x = width/2;
 		y = height/2;
-	} else {
+	} else
 		gameOver = 1;
-		//for (int i = 0; i <= nTail; i++) {
-		//	tailY[i] = -1;
-		//	tailX[i] = -1;
-		//}
-	}
 }
 
 void Logic()
@@ -252,7 +255,7 @@ void Logic()
 	}
 
 	/*
-	 * Game boundry.
+	 * Game boundary.
 	 */
 
 	if ((x == width-1 || x == 0 || y == height-1 || y == 0 ) && 
@@ -346,7 +349,6 @@ void Menu()
 			Play();
 			c = 'o';
 		case 'o':
-			gameOver = 0;
 			mvprintw(height/2, (width/2)-4,
 					"Game over!");
 			refresh();
@@ -355,8 +357,6 @@ void Menu()
 					"Would you like to play again?");
 			mvprintw((height/2)+1, (width/2)-17,
 					"Press 's' to start or 'q' to quit.");
-			mvprintw((height/2)+2, (width/2)-17, 
-					">>> %d", gameOver);
 			refresh();
 			break;
 		default:
