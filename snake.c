@@ -269,11 +269,6 @@ void Logic()
 	}
 
 	/*
-	 * Check start flag so as to avoid a continual loopback to gameOver
-	 * after endGame is set.
-	 */
-
-	/*
 	 * Game boundary; Through the walls or total destruction.
 	 */
 
