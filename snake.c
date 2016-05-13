@@ -236,10 +236,6 @@ void Logic()
 	tailX[0] = x;
 	tailY[0] = y;
 
-	//if (nTail > 1) {
-	//	mvwaddch(gameWin, tailY[nTail-1], tailX[nTail-1], ' ');
-	//}
-
 	for (int i = 1; i < nTail; i++) {
 
 		prev2X   =  tailX[i];
