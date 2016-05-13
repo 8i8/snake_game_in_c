@@ -9,18 +9,25 @@
 #include <stdlib.h>
 #include <time.h>
 
+#define START_LENGTH	25
+
 static WINDOW* gameWin;
 static int gameOver;
 static int imortal;
+static int maxWidth;
+static int maxHeight;
 static int width;
 static int height;
-static int ticker;
 static int x, y, fruitX, fruitY, score;
-static int tailX[100], tailY[100];
+static int tail[200][3]= {{0},{0}};
 static int nTail;
 static int speedDelay;
 static char dir;
-static char prevDir;
+static char dir2;
+
+static int ticker;
+static int debug;
+static int step;
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
  *  Setup
@@ -37,9 +44,11 @@ void gameMode()
 void SetupCurses()
 {
 	initscr();
-	getmaxyx(stdscr, height, width);// Set screen height and width.
+	getmaxyx(stdscr, maxHeight, maxWidth);// Set screen height and width.
+	height = maxHeight;
+	width = maxWidth;
+	gameWin = newwin(maxHeight, maxWidth, 0, 0);
 	height--;
-	gameWin = newwin(height, width, 0, 0);
 	keypad(stdscr, true);		// Use advanced keyboard functionality.
 	gameMode();
 }
@@ -48,71 +57,190 @@ void Start()
 {
 	srand(time(NULL));
 
-	// Nav and positions.
+	/* 
+	 * Initialize var's
+	 */
+	speedDelay	= 100000;
+	ticker  	= 0;
+	dir		= 'R';
 	fruitX 		= rand() % width;
 	fruitY 		= rand() % height;
 	x		= width / 2;
 	y		= height / 2;
-	dir		= 'S';
+	score 		= 0;
 
-	// Booleans
-	ticker  	= 0;
+	/*
+	 * Booleans
+	 */
 	imortal		= 0;
 	gameOver	= 0;
 
-	speedDelay	= 100000;
-	nTail		= 0;
-	score 		= 0;
+	/*
+	 * Clean the tail array, who knows who used it last!
+	 */
+	for (int i = 0; i < nTail; i++)
+		tail[i][2] = '\0';
 
-	wrefresh(gameWin);
-	refresh();
+	nTail		= START_LENGTH;
+
+	for (int i = 0; i < nTail; i++) {
+		tail[i][0] = y;
+		tail[i][1] = x-(i);
+		tail[i][2] = 'R';
+	}
 }
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
  *  Draw
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-void drawTail(int* i, int* j)
+void drawTail(int* j, int* i)
 {
 	for (int k = 0; k < nTail; k++) {
 
-		if (*i != 0 && tailX[k] == *i && tailY[k] == *j)
-			mvwprintw(gameWin, *j, *i, "o");
+		if (*j != 0 && *i != 0 && tail[k][0] == *j && tail[k][1] == *i) {
+
+			//mvwaddch(gameWin, *j, *i, 'o');
+
+			/*
+			 * Print the correct gliph for the snakes body.
+			 *
+			 * 1	ACS_HLINE
+			 * 2	ACS_VLINE
+			 * 3	ACS_ULCORNER
+			 * 4	ACS_URCORNER
+			 * 5	ACS_LRCORNER
+			 * 6	ACS_LLCORNER
+			 *
+			 */
+
+			switch (tail[k][2]) {
+
+			case 1:
+				mvwaddch(gameWin, *j, *i, ACS_HLINE);
+				break;
+			case 2:
+				mvwaddch(gameWin, *j, *i, ACS_VLINE);
+				break;
+			case 3:
+				mvwaddch(gameWin, *j, *i, ACS_ULCORNER);
+				break;
+			case 4:
+				mvwaddch(gameWin, *j, *i, ACS_URCORNER);
+				break;
+			case 5:
+				mvwaddch(gameWin, *j, *i, ACS_LRCORNER);
+				break;
+			case 6:
+				mvwaddch(gameWin, *j, *i, ACS_LLCORNER);
+				break;
+			default:
+				break;
+			}
+		}
 	}
 }
 
 void Draw()
 {
 	werase(gameWin);
-	box(gameWin, 0, 0);
 
+	/*
+	 * Screed borders
+	 */
+	for (int i = 1; i < width-1; i++)
+		mvwaddch(gameWin, 0, i, ACS_HLINE);
+	for (int i = 1; i < width-1; i++)
+		mvwaddch(gameWin, height-1, i, ACS_HLINE);
+	for (int i = 1; i < height-1; i++)
+		mvwaddch(gameWin, i, 0, ACS_VLINE);
+	for (int i = 1; i < height-1; i++)
+		mvwaddch(gameWin, i, width-1, ACS_VLINE);
+
+	/*
+	 * Corners
+	 */
+	mvwaddch(gameWin, 0, 0, ACS_ULCORNER);
+	mvwaddch(gameWin, 0, width-1, ACS_URCORNER);
+	mvwaddch(gameWin, height-1, 0, ACS_LLCORNER);
+	mvwaddch(gameWin, height-1, width-1, ACS_LRCORNER);
+
+	/*
+	 * Objects on the matrix
+	 */
 	for (int j = 0; j < height; j++) {
 
 		for (int i = 0; i < width; i++) {
 
 			if (j == y && i == x)
-				mvwprintw(gameWin, j, i, "@");
+				mvwaddch(gameWin, j, i, ACS_DIAMOND);
 
 			else if (j == fruitY && i == fruitX)
 				mvwprintw(gameWin, j, i, "F");
 
 			else
-				drawTail(&i, &j);
+				drawTail(&j, &i);
 		}
 	}
 
 	/*
 	 * Set the score
 	 */
-
 	mvprintw(height, 2, "Score: %d", score);
+
+	/*
+	 * Debugging
+	 */
+	if (imortal == 1)
+		mvwaddch(gameWin, height, width-2, 'I');
+
 	wrefresh(gameWin);
-	refresh();
 }
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
- *  Logic
+ *  Debuging
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+void Pause()
+{
+	nodelay(stdscr, false);
+	getch();
+	nodelay(stdscr, true);
+}
+
+void debugSwitch()
+{
+	if (debug == 0) {
+		debug = 1;
+		if (y >= height-10) {
+			y = height-11;
+			if (dir == 'D' && x > width/2)
+				dir = 'L';
+			else if (dir == 'D' && x < width/2)
+				dir = 'R';
+		}
+		if (fruitY >= height-9)
+			fruitY = (height-9)/2;
+		height-=9;
+		wrefresh(gameWin);
+	} else {
+		debug = 0;
+		height+=9;
+		wrefresh(gameWin);
+	}
+}
+
+void stepMode()
+{
+	if (step == 0){
+		nodelay(stdscr, false);
+		step = 1;
+	} else {
+		nodelay(stdscr, true);
+		step = 0;
+	}
+}
+
 
 void superpower()
 {
@@ -121,6 +249,54 @@ void superpower()
 	else
 		imortal = 0;
 }
+
+void debugTail()
+{
+	WINDOW* pad;
+
+	pad = subpad(gameWin, height , width, height+2, 0);
+	touchwin(pad);
+			prefresh(pad, 0, 0, height+2, 0, 9, width);
+	
+	if (debug == 1) {
+		mvwprintw(pad, 0, 15, "y = %-3.d x = %-3.d dir = %-3.d\n", y, x, dir);
+	if (imortal == 1)
+		mvwprintw(pad, 0, width-2, "I", y, x, dir);
+
+		for (int i = 0; i < nTail; i++)	{
+
+
+			if (i < 10) {
+				mvwprintw(pad, i, 15,		"y = %-3d x = %-3d dir = %-3d\n",
+								tail[i][0], tail[i][1], tail[i][2]);
+			} else if (i >= 10 && i <= 19) {
+				mvwprintw(pad, i-10, 45,	"y = %-3d x = %-3d dir = %-3d\n",
+								tail[i][0], tail[i][1], tail[i][2]);
+			} else if (i >= 20 && i <= 29) {
+				mvwprintw(pad, i-20, 75,	"y = %-3d x = %-3d dir = %-3d\n",
+								tail[i][0], tail[i][1], tail[i][2]);
+			} else if (i >= 30 && i <= 39) {
+				mvwprintw(pad, i-30, 105,	"y = %-3d x = %-3d dir = %-3d\n", 
+								tail[i][0], tail[i][1], tail[i][2]);
+			} else if (i >= 40 && i <= 49) {
+				mvwprintw(pad, i-40, 135, 	"y = %-3d x = %-3d dir = %-3d\n", 
+								tail[i][0], tail[i][1], tail[i][2]);
+			} else if (i >= 50 && i <= 59) {
+				mvwprintw(pad, i-50, 165, 	"y = %-3d x = %-3d dir = %-3d\n", 
+								tail[i][0], tail[i][1], tail[i][2]);
+			}
+
+			touchwin(pad);
+			prefresh(pad, 0, 0, height+2, 0, 9, width);
+			wrefresh(gameWin);
+			//Pause();
+		}
+	}
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
+ *  Logic sub routines
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 void keys(int* c)
 {
@@ -136,6 +312,10 @@ void keys(int* c)
 		*c = 5;
 	else if  (*c == 'i')
 		*c = 6;
+	else if  (*c == 'd')
+		*c = 7;
+	else if  (*c == 's')
+		*c = 8;
 }
 
 void Input()
@@ -143,7 +323,7 @@ void Input()
 	int c = getch();
 	keys(&c);
 
-	prevDir = dir;
+	dir2 = dir;
 
 	switch (c) {
 
@@ -175,6 +355,29 @@ void Input()
 	case 6:
 		superpower();
 		break;
+	case 7:
+		debugSwitch();
+		break;
+	case 8:
+		stepMode();
+		break;
+	}
+}
+
+void reduceProbability()
+{
+	srand(time(NULL)-777);
+
+	while (fruitX == width-1 || fruitX == 0 || fruitY == height-1 || fruitY == 0 ) {
+
+		int i = rand();
+
+		if ((i % 6) == 0)
+			break;
+		else {
+			fruitX 	= rand() % width;
+			fruitY 	= rand() % height;
+		}
 	}
 }
 
@@ -185,11 +388,16 @@ void Input()
 void fruity()
 {
 	srand(time(NULL));
-
+	// Generate fruit.
 	score 	+= 10;
 	fruitX 	= rand() % width;
 	fruitY 	= rand() % height;
-	nTail 	= nTail + 1;
+	if (fruitX == width-1 || fruitX == 0 || fruitY == height-1 || fruitY == 0 ) {
+		reduceProbability();
+	}
+
+	// Tail growth.
+	nTail++;
 
 	// Speed up
 	if (score % 50 == 0)
@@ -198,22 +406,33 @@ void fruity()
 
 /*
  * An endgame with a get-out clause.
+ *
+ * (x == width || x == -1 || y == height || y == -1)
  */
 
 void endGame()
 {
 	if (imortal == 1) {
-		x = width/2;
-		y = height/2;
-	} else {
-		gameOver = 1;
-		for (int i = 0; i <= nTail; i++) {
-			tailY[i] = -3;
-			tailX[i] = -3;
-		}
 
-	}
+		if 	(x == width)
+			x = 1;
+		else if	(x == -1)
+			x = width-1;
+		else if	(y == height)	
+			y = 1;
+		else if (y == -1)
+			y = height-1;
+
+		//x = width/2;
+		//y = height/2;
+	} else 
+		gameOver = 1;
+
 }
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
+ *  Logic main
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 void Logic()
 {
@@ -221,34 +440,52 @@ void Logic()
 	 * Snakes tail.
 	 */
 
-	int prevX  =  tailX[0];
-	int prevY  =  tailY[0];
-	int prev2X, prev2Y;
+	int prevY   =  tail[0][0];
+	int prevX   =  tail[0][1];
+	int prevDir =  tail[0][2];
+	int prev2X, prev2Y, prev2Dir;
 
-	if (ticker == 0) {
+	tail[0][0] = y;
+	tail[0][1] = x;
 
-		prevY 	= -1;
-		prev2Y 	= -1;
-		prevX 	= -1;
-		prev2X 	= -1;
-	}
+	/*
+	 * Decide the correct gliph, for the snakes cornering.
+	 *
+	 * 1	ACS_HLINE
+	 * 2	ACS_VLINE
+	 * 3	ACS_ULCORNER
+	 * 4	ACS_URCORNER
+	 * 5	ACS_LRCORNER
+	 * 6	ACS_LLCORNER
+	 *
+	 */
 
-	tailX[0] = x;
-	tailY[0] = y;
+	if 	((dir == dir2) && (dir == 'R' || dir == 'L'))
+		tail[0][2] = 1;
+	else if	((dir == dir2) && (dir == 'U' || dir == 'D'))
+		tail[0][2] = 2;
+	else if	((dir == 'R' && dir2 == 'U') || (dir == 'D' && dir2 == 'L'))
+		tail[0][2] = 3;
+	else if	((dir == 'D' && dir2 == 'R') || (dir == 'L' && dir2 == 'U'))
+		tail[0][2] = 4;
+	else if	((dir == 'L' && dir2 == 'D') || (dir == 'U' && dir2 == 'R'))
+		tail[0][2] = 5;
+	else if	((dir == 'U' && dir2 == 'L') || (dir == 'R' && dir2 == 'D'))
+		tail[0][2] = 6;
+
 
 	for (int i = 1; i < nTail; i++) {
 
-		prev2X   =  tailX[i];
-		prev2Y   =  tailY[i];
-		tailX[i] =  prevX;
-		tailY[i] =  prevY;
-		prevX    =  prev2X;
-		prevY    =  prev2Y;
+		prev2Y     =  tail[i][0];
+		prev2X     =  tail[i][1];
+		prev2Dir   =  tail[i][2];
+		tail[i][0] =  prevY;
+		tail[i][1] =  prevX;
+		tail[i][2] =  prevDir;
+		prevY	   =  prev2Y;
+		prevX	   =  prev2X;
+		prevDir    =  prev2Dir;
 	}
-
-	/*
-	 * Snake direction.
-	 */
 
 	switch (dir)
 	{
@@ -298,14 +535,14 @@ void Logic()
 	 */
 
 	for (int i = 0; i < nTail; i++)
-		if (tailX[i] == x && tailY[i] == y)
+		if (tail[i][0] == y && tail[i][1] == x)
 			endGame();
 
 	/*
 	 * Get fruity here.
 	 */
 
-	if (x == fruitX && y == fruitY)
+	if (y == fruitY && x == fruitX)
 		fruity();
 }
 
@@ -324,6 +561,7 @@ void Play()
 		Logic();
 		usleep(speedDelay);
 		ticker++;
+		debugTail();
 	}
 }
 
@@ -337,14 +575,13 @@ void Exit()
 
 void Menu()
 {
-	
-	werase(gameWin);
+	//werase(gameWin);
 	erase();
 	mvprintw((height/2)-2, (width/2)-16,
 			"Welcome to Snake Dungeons");
 	mvprintw((height/2), (width/2)-16,
 			"Enter at your own peril ...");
-	wrefresh(stdscr);
+	refresh();
 	usleep(1200000);
 	mvprintw((height/2+2), (width/2)-16,
 			"Press 's' to begin, or to run away use 'q'.");
