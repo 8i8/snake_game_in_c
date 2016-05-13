@@ -14,11 +14,13 @@ static int gameOver;
 static int imortal;
 static int width;
 static int height;
+static int ticker;
 static int x, y, fruitX, fruitY, score;
 static int tailX[100], tailY[100];
 static int nTail;
 static int speedDelay;
 static char dir;
+static char prevDir;
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
  *  Setup
@@ -30,14 +32,6 @@ void gameMode()
 	cbreak();			// disable line buffering.
 	curs_set(false);		// No visible cursor.
 	nodelay(stdscr, true);		// Do not wait for getch()
-}
-
-void menuMode()
-{
-	//echo();			// Show typing.
-	//nocbreak();			// Return to cooked mode.
-	//curs_set(true);		// Show cursor.
-	nodelay(stdscr, false);		// Pause for getch()
 }
 
 void SetupCurses()
@@ -52,17 +46,24 @@ void SetupCurses()
 
 void Start()
 {
-	gameMode();
-	imortal = 0;
-	gameOver = 0;
-	speedDelay = 100000;
-	dir = 'S';
-	x = width / 2;
-	y = height / 2;
 	srand(time(NULL));
-	fruitX = rand() % width;
-	fruitY = rand() % height;
-	score = 0;
+
+	// Nav and positions.
+	fruitX 		= rand() % width;
+	fruitY 		= rand() % height;
+	x		= width / 2;
+	y		= height / 2;
+	dir		= 'S';
+
+	// Booleans
+	ticker  	= 0;
+	imortal		= 0;
+	gameOver	= 0;
+
+	speedDelay	= 100000;
+	nTail		= 0;
+	score 		= 0;
+
 	wrefresh(gameWin);
 	refresh();
 }
@@ -142,6 +143,8 @@ void Input()
 	int c = getch();
 	keys(&c);
 
+	prevDir = dir;
+
 	switch (c) {
 
 	case 1:
@@ -181,11 +184,12 @@ void Input()
 
 void fruity()
 {
-	score += 10;
 	srand(time(NULL));
-	fruitX = rand() % width;
-	fruitY = rand() % height;
-	nTail = nTail + 1;
+
+	score 	+= 10;
+	fruitX 	= rand() % width;
+	fruitY 	= rand() % height;
+	nTail 	= nTail + 1;
 
 	// Speed up
 	if (score % 50 == 0)
@@ -201,8 +205,14 @@ void endGame()
 	if (imortal == 1) {
 		x = width/2;
 		y = height/2;
-	} else
+	} else {
 		gameOver = 1;
+		for (int i = 0; i <= nTail; i++) {
+			tailY[i] = -3;
+			tailX[i] = -3;
+		}
+
+	}
 }
 
 void Logic()
@@ -214,6 +224,14 @@ void Logic()
 	int prevX  =  tailX[0];
 	int prevY  =  tailY[0];
 	int prev2X, prev2Y;
+
+	if (ticker == 0) {
+
+		prevY 	= -1;
+		prev2Y 	= -1;
+		prevX 	= -1;
+		prev2X 	= -1;
+	}
 
 	tailX[0] = x;
 	tailY[0] = y;
@@ -255,11 +273,16 @@ void Logic()
 	}
 
 	/*
+	 * Check start flag so as to avoid a continual loopback to gameOver
+	 * after endGame is set.
+	 */
+
+	/*
 	 * Game boundary; Through the walls or total destruction.
 	 */
 
 	if ((x == width-1 || x == 0 || y == height-1 || y == 0 ) && 
-                        (x == fruitX && y == fruitY)) {
+			(x == fruitX && y == fruitY)) {
 
 		if (x == width-1)
 			x = 1;
@@ -275,7 +298,7 @@ void Logic()
 
 		fruity();
 
-        } else if (x == width || x == -1 || y == height || y == -1)
+	} else if (x == width || x == -1 || y == height || y == -1)
 
 		endGame();
 
@@ -292,7 +315,7 @@ void Logic()
 	 */
 
 	if (x == fruitX && y == fruitY)
-	        fruity();
+		fruity();
 }
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
@@ -309,6 +332,7 @@ void Play()
 		Input();
 		Logic();
 		usleep(speedDelay);
+		ticker++;
 	}
 }
 
@@ -374,7 +398,6 @@ int main()
 	SetupCurses();
 	Menu();
 	Exit();
-
 	return 0;
 }
 
