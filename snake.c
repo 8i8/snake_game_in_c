@@ -103,7 +103,7 @@ void drawTail(int* j, int* i)
 			//mvwaddch(gameWin, *j, *i, 'o');
 
 			/*
-			 * Print the correct gliph for the snakes body.
+			 * Print the correct glyph for the snakes body.
 			 *
 			 * 1	ACS_HLINE
 			 * 2	ACS_VLINE
@@ -146,8 +146,9 @@ void Draw()
 	werase(gameWin);
 
 	/*
-	 * Screed borders
+	 * Borders
 	 */
+
 	for (int i = 1; i < width-1; i++)
 		mvwaddch(gameWin, 0, i, ACS_HLINE);
 	for (int i = 1; i < width-1; i++)
@@ -160,6 +161,7 @@ void Draw()
 	/*
 	 * Corners
 	 */
+
 	mvwaddch(gameWin, 0, 0, ACS_ULCORNER);
 	mvwaddch(gameWin, 0, width-1, ACS_URCORNER);
 	mvwaddch(gameWin, height-1, 0, ACS_LLCORNER);
@@ -168,6 +170,7 @@ void Draw()
 	/*
 	 * Objects on the matrix
 	 */
+
 	for (int j = 0; j < height; j++) {
 
 		for (int i = 0; i < width; i++) {
@@ -186,11 +189,13 @@ void Draw()
 	/*
 	 * Set the score
 	 */
+
 	mvprintw(height, 2, "Score: %d", score);
 
 	/*
 	 * Debugging
 	 */
+
 	if (imortal == 1)
 		mvwaddch(gameWin, height, width-2, 'I');
 
@@ -198,7 +203,7 @@ void Draw()
 }
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
- *  Debuging
+ *  Debugging
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 void Pause()
@@ -207,6 +212,12 @@ void Pause()
 	getch();
 	nodelay(stdscr, true);
 }
+
+/*
+ * Fold up the bottom of the screen to reveal details of the coordinates of the
+ * snakes tail, to be used for implementing modifications to the tail array
+ * behavior,
+ */
 
 void debugSwitch()
 {
@@ -230,6 +241,10 @@ void debugSwitch()
 	}
 }
 
+/*
+ * Turn of nodelay() mode to allow step by step movement.
+ */
+
 void stepMode()
 {
 	if (step == 0){
@@ -241,6 +256,9 @@ void stepMode()
 	}
 }
 
+/*
+ * Turn of fatality.
+ */
 
 void superpower()
 {
@@ -249,6 +267,11 @@ void superpower()
 	else
 		imortal = 0;
 }
+
+/*
+ * Precise details of the snakes tail array, displayed below the main screen
+ * when initialised.
+ */
 
 void debugTail()
 {
@@ -298,6 +321,11 @@ void debugTail()
  *  Logic sub routines
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
+/*
+ * Keys() takes pointers from the user Input() function, permitting multiple
+ * keys linked to the same switch case.
+ */
+
 void keys(int* c)
 {
 	if 	((*c == 'h') || (*c == KEY_LEFT))
@@ -317,6 +345,10 @@ void keys(int* c)
 	else if  (*c == 's')
 		*c = 8;
 }
+
+/*
+ * Gather user input from the keyboard.
+ */
 
 void Input()
 {
@@ -364,6 +396,11 @@ void Input()
 	}
 }
 
+/*
+ * Use rand() to reduce the probability of the occurrence of fruit placed on
+ * the window border line.
+ */
+
 void reduceProbability()
 {
 	srand(time(NULL)-777);
@@ -382,13 +419,22 @@ void reduceProbability()
 }
 
 /*
- * Add to score and replace fruit.
+ * Add to the score and replace fruit.
  */
 
 void fruity()
 {
+	/*
+	 * Generate new fruit placements, if they occur on the screen border,
+	 * run a further  rand command to decide whether or not to leave them
+	 * in place.
+	 *
+	 * Border cases:
+	 *
+	 * (fruitX == width-1 || fruitX == 0 || fruitY == height-1 || fruitY == 0 
+	 */
+
 	srand(time(NULL));
-	// Generate fruit.
 	score 	+= 10;
 	fruitX 	= rand() % width;
 	fruitY 	= rand() % height;
@@ -396,10 +442,16 @@ void fruity()
 		reduceProbability();
 	}
 
-	// Tail growth.
+	/*
+	 * Tail growth.
+	 */
+
 	nTail++;
 
-	// Speed up
+	/*
+	 * Increase snakes speed.
+	 */
+
 	if (score % 50 == 0)
 		speedDelay = speedDelay - 3000;
 }
@@ -423,8 +475,6 @@ void endGame()
 		else if (y == -1)
 			y = height-1;
 
-		//x = width/2;
-		//y = height/2;
 	} else 
 		gameOver = 1;
 
@@ -437,7 +487,22 @@ void endGame()
 void Logic()
 {
 	/*
-	 * Snakes tail.
+	 * Snakes tail, shift the details of each tail segment back one place
+	 * in the array, the second dimension of the array holds three values.
+	 *
+	 * 	0 = y
+	 * 	1 = x
+	 * 	2 = tail segments.
+	 *
+	 * Glyph, for the snakes tail, cornering.
+	 *
+	 * 	1	ACS_HLINE
+	 * 	2	ACS_VLINE
+	 * 	3	ACS_ULCORNER
+	 * 	4	ACS_URCORNER
+	 * 	5	ACS_LRCORNER
+	 * 	6	ACS_LLCORNER
+	 *
 	 */
 
 	int prevY   =  tail[0][0];
@@ -447,18 +512,6 @@ void Logic()
 
 	tail[0][0] = y;
 	tail[0][1] = x;
-
-	/*
-	 * Decide the correct gliph, for the snakes cornering.
-	 *
-	 * 1	ACS_HLINE
-	 * 2	ACS_VLINE
-	 * 3	ACS_ULCORNER
-	 * 4	ACS_URCORNER
-	 * 5	ACS_LRCORNER
-	 * 6	ACS_LLCORNER
-	 *
-	 */
 
 	if 	((dir == dir2) && (dir == 'R' || dir == 'L'))
 		tail[0][2] = 1;
@@ -473,7 +526,6 @@ void Logic()
 	else if	((dir == 'U' && dir2 == 'L') || (dir == 'R' && dir2 == 'D'))
 		tail[0][2] = 6;
 
-
 	for (int i = 1; i < nTail; i++) {
 
 		prev2Y     =  tail[i][0];
@@ -486,6 +538,10 @@ void Logic()
 		prevX	   =  prev2X;
 		prevDir    =  prev2Dir;
 	}
+
+	/*
+	 * Move the snakes head.
+	 */
 
 	switch (dir)
 	{
@@ -506,7 +562,10 @@ void Logic()
 	}
 
 	/*
-	 * Game boundary; Through the walls or total destruction.
+	 * Game boundary; Through the walls or total destruction? If fruit is
+	 * placed on the boundary and is eaten by the snake, yes a vegetarian
+	 * snake, the snake passes through the boundary an emerges on the
+	 * opposite side of the screen.
 	 */
 
 	if ((x == width-1 || x == 0 || y == height-1 || y == 0 ) && 
@@ -554,6 +613,11 @@ void Play()
 {
 	gameOver = 0;
 
+	/*
+	 * This loop runs throughout game play being essentially the crux of
+	 * this program.
+	 */
+
 	while (gameOver == 0) {
 
 		Draw();
@@ -565,6 +629,10 @@ void Play()
 	}
 }
 
+/*
+ * Program shut down.
+ */
+
 void Exit()
 {
 	wborder(gameWin, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
@@ -575,7 +643,6 @@ void Exit()
 
 void Menu()
 {
-	//werase(gameWin);
 	erase();
 	mvprintw((height/2)-2, (width/2)-16,
 			"Welcome to Snake Dungeons");
