@@ -225,16 +225,16 @@ void debugTail()
 				mvprintw(height+1+i-10, 44,	"y = %2.d, x = %2.d, dir = %2.d.\n",
 						tail[i][0], tail[i][1], tail[i][2]);
 			else if (i >= 20 && i <= 20)
-				mvprintw(height+1+i-10, 74,	"y = %2.d, x = %2.d, dir = %2.d.\n",
+				mvprintw(height+1+i-20, 74,	"y = %2.d, x = %2.d, dir = %2.d.\n",
 						tail[i][0], tail[i][1], tail[i][2]);
 			else if (i >= 30 && i <= 30)
-				mvprintw(height+1+i-10, 104,	"y = %2.d, x = %2.d, dir = %2.d.\n", 
+				mvprintw(height+1+i-30, 104,	"y = %2.d, x = %2.d, dir = %2.d.\n", 
 						tail[i][0], tail[i][1], tail[i][2]);
 			else if (i >= 40 && i <= 40)
-				mvprintw(height+1+i-10, 134, 	"y = %2.d, x = %2.d, dir = %2.d.\n", 
+				mvprintw(height+1+i-40, 134, 	"y = %2.d, x = %2.d, dir = %2.d.\n", 
 						tail[i][0], tail[i][1], tail[i][2]);
 			else if (i >= 50 && i <= 50)
-				mvprintw(height+1+i-10, 164, 	"y = %2.d, x = %2.d, dir = %2.d.\n", 
+				mvprintw(height+1+i-50, 164, 	"y = %2.d, x = %2.d, dir = %2.d.\n", 
 						tail[i][0], tail[i][1], tail[i][2]);
 
 			refresh();
@@ -464,13 +464,13 @@ void Exit()
 
 void Menu()
 {
-	werase(gameWin);
+	//werase(gameWin);
 	erase();
 	mvprintw((height/2)-2, (width/2)-16,
 			"Welcome to Snake Dungeons");
 	mvprintw((height/2), (width/2)-16,
 			"Enter at your own peril ...");
-	wrefresh(stdscr);
+	refresh();
 	usleep(1200000);
 	mvprintw((height/2+2), (width/2)-16,
 			"Press 's' to begin, or to run away use 'q'.");
