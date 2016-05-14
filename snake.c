@@ -267,23 +267,23 @@ void debugTail()
 
 
 			if (i < 10) {
-				mvwprintw(pad, i, 15,		"y = %-3d x = %-3d dir = %-3d\n",
-								tail[i][0], tail[i][1], tail[i][2]);
+				mvwprintw(pad, i, 15,	 "y = %-3d x = %-3d dir = %-3d\n",
+							tail[i][0], tail[i][1], tail[i][2]);
 			} else if (i >= 10 && i <= 19) {
-				mvwprintw(pad, i-10, 45,	"y = %-3d x = %-3d dir = %-3d\n",
-								tail[i][0], tail[i][1], tail[i][2]);
+				mvwprintw(pad, i-10, 45, "y = %-3d x = %-3d dir = %-3d\n",
+							tail[i][0], tail[i][1], tail[i][2]);
 			} else if (i >= 20 && i <= 29) {
-				mvwprintw(pad, i-20, 75,	"y = %-3d x = %-3d dir = %-3d\n",
-								tail[i][0], tail[i][1], tail[i][2]);
+				mvwprintw(pad, i-20, 75, "y = %-3d x = %-3d dir = %-3d\n",
+							tail[i][0], tail[i][1], tail[i][2]);
 			} else if (i >= 30 && i <= 39) {
-				mvwprintw(pad, i-30, 105,	"y = %-3d x = %-3d dir = %-3d\n", 
-								tail[i][0], tail[i][1], tail[i][2]);
+				mvwprintw(pad, i-30, 105,"y = %-3d x = %-3d dir = %-3d\n",
+							tail[i][0], tail[i][1], tail[i][2]);
 			} else if (i >= 40 && i <= 49) {
-				mvwprintw(pad, i-40, 135, 	"y = %-3d x = %-3d dir = %-3d\n", 
-								tail[i][0], tail[i][1], tail[i][2]);
+				mvwprintw(pad, i-40, 135,"y = %-3d x = %-3d dir = %-3d\n",
+							tail[i][0], tail[i][1], tail[i][2]);
 			} else if (i >= 50 && i <= 59) {
-				mvwprintw(pad, i-50, 165, 	"y = %-3d x = %-3d dir = %-3d\n", 
-								tail[i][0], tail[i][1], tail[i][2]);
+				mvwprintw(pad, i-50, 165, "y = %-3d x = %-3d dir = %-3d\n",
+							tail[i][0], tail[i][1], tail[i][2]);
 			}
 
 			touchwin(pad);
