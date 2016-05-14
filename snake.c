@@ -60,6 +60,7 @@ void Start()
 	/* 
 	 * Initialize var's
 	 */
+
 	speedDelay	= 100000;
 	ticker  	= 0;
 	dir		= 'R';
@@ -72,12 +73,14 @@ void Start()
 	/*
 	 * Booleans
 	 */
+
 	imortal		= 0;
 	gameOver	= 0;
 
 	/*
 	 * Clean the tail array, who knows who used it last!
 	 */
+
 	for (int i = 0; i < nTail; i++)
 		tail[i][2] = '\0';
 
@@ -100,14 +103,8 @@ void drawTail(int* j, int* i)
 
 		if (*j != 0 && *i != 0 && tail[k][0] == *j && tail[k][1] == *i) {
 
-			//mvwaddch(gameWin, *j, *i, 'o');
-
 			/*
-<<<<<<< HEAD
-			 * Print the correct gliph for the snakes body.
-=======
 			 * Print the correct glyph for the snakes body.
->>>>>>> work
 			 *
 			 * 1	ACS_HLINE
 			 * 2	ACS_VLINE
@@ -148,8 +145,6 @@ void drawTail(int* j, int* i)
 void Draw()
 {
 	werase(gameWin);
-<<<<<<< HEAD
-=======
 
 	/*
 	 * Borders
@@ -176,31 +171,7 @@ void Draw()
 	/*
 	 * Objects on the matrix
 	 */
->>>>>>> work
 
-	/*
-	 * Screed borders
-	 */
-	for (int i = 1; i < width-1; i++)
-		mvwaddch(gameWin, 0, i, ACS_HLINE);
-	for (int i = 1; i < width-1; i++)
-		mvwaddch(gameWin, height-1, i, ACS_HLINE);
-	for (int i = 1; i < height-1; i++)
-		mvwaddch(gameWin, i, 0, ACS_VLINE);
-	for (int i = 1; i < height-1; i++)
-		mvwaddch(gameWin, i, width-1, ACS_VLINE);
-
-	/*
-	 * Corners
-	 */
-	mvwaddch(gameWin, 0, 0, ACS_ULCORNER);
-	mvwaddch(gameWin, 0, width-1, ACS_URCORNER);
-	mvwaddch(gameWin, height-1, 0, ACS_LLCORNER);
-	mvwaddch(gameWin, height-1, width-1, ACS_LRCORNER);
-
-	/*
-	 * Objects on the matrix
-	 */
 	for (int j = 0; j < height; j++) {
 
 		for (int i = 0; i < width; i++) {
@@ -219,15 +190,13 @@ void Draw()
 	/*
 	 * Set the score
 	 */
+
 	mvprintw(height, 2, "Score: %d", score);
 
 	/*
 	 * Debugging
 	 */
-<<<<<<< HEAD
-=======
 
->>>>>>> work
 	if (imortal == 1)
 		mvwaddch(gameWin, height, width-2, 'I');
 
@@ -235,11 +204,7 @@ void Draw()
 }
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
-<<<<<<< HEAD
- *  Debuging
-=======
  *  Debugging
->>>>>>> work
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 void Pause()
@@ -249,15 +214,12 @@ void Pause()
 	nodelay(stdscr, true);
 }
 
-<<<<<<< HEAD
-=======
 /*
  * Fold up the bottom of the screen to reveal details of the coordinates of the
  * snakes tail, to be used for implementing modifications to the tail array
  * behavior,
  */
 
->>>>>>> work
 void debugSwitch()
 {
 	if (debug == 0) {
@@ -280,13 +242,10 @@ void debugSwitch()
 	}
 }
 
-<<<<<<< HEAD
-=======
 /*
  * Turn of nodelay() mode to allow step by step movement.
  */
 
->>>>>>> work
 void stepMode()
 {
 	if (step == 0){
@@ -298,12 +257,9 @@ void stepMode()
 	}
 }
 
-<<<<<<< HEAD
-=======
 /*
  * Turn of fatality.
  */
->>>>>>> work
 
 void superpower()
 {
@@ -313,14 +269,11 @@ void superpower()
 		imortal = 0;
 }
 
-<<<<<<< HEAD
-=======
 /*
  * Precise details of the snakes tail array, displayed below the main screen
  * when initialised.
  */
 
->>>>>>> work
 void debugTail()
 {
 	WINDOW* pad;
@@ -338,25 +291,6 @@ void debugTail()
 
 
 			if (i < 10) {
-<<<<<<< HEAD
-				mvwprintw(pad, i, 15,		"y = %-3d x = %-3d dir = %-3d\n",
-								tail[i][0], tail[i][1], tail[i][2]);
-			} else if (i >= 10 && i <= 19) {
-				mvwprintw(pad, i-10, 45,	"y = %-3d x = %-3d dir = %-3d\n",
-								tail[i][0], tail[i][1], tail[i][2]);
-			} else if (i >= 20 && i <= 29) {
-				mvwprintw(pad, i-20, 75,	"y = %-3d x = %-3d dir = %-3d\n",
-								tail[i][0], tail[i][1], tail[i][2]);
-			} else if (i >= 30 && i <= 39) {
-				mvwprintw(pad, i-30, 105,	"y = %-3d x = %-3d dir = %-3d\n", 
-								tail[i][0], tail[i][1], tail[i][2]);
-			} else if (i >= 40 && i <= 49) {
-				mvwprintw(pad, i-40, 135, 	"y = %-3d x = %-3d dir = %-3d\n", 
-								tail[i][0], tail[i][1], tail[i][2]);
-			} else if (i >= 50 && i <= 59) {
-				mvwprintw(pad, i-50, 165, 	"y = %-3d x = %-3d dir = %-3d\n", 
-								tail[i][0], tail[i][1], tail[i][2]);
-=======
 				mvwprintw(pad, i, 15,	 "y = %-3d x = %-3d dir = %-3d\n",
 							tail[i][0], tail[i][1], tail[i][2]);
 			} else if (i >= 10 && i <= 19) {
@@ -374,7 +308,6 @@ void debugTail()
 			} else if (i >= 50 && i <= 59) {
 				mvwprintw(pad, i-50, 165, "y = %-3d x = %-3d dir = %-3d\n",
 							tail[i][0], tail[i][1], tail[i][2]);
->>>>>>> work
 			}
 
 			touchwin(pad);
@@ -389,14 +322,11 @@ void debugTail()
  *  Logic sub routines
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-<<<<<<< HEAD
-=======
 /*
  * Keys() takes pointers from the user Input() function, permitting multiple
  * keys linked to the same switch case.
  */
 
->>>>>>> work
 void keys(int* c)
 {
 	if 	((*c == 'h') || (*c == KEY_LEFT))
@@ -464,26 +394,6 @@ void Input()
 	case 8:
 		stepMode();
 		break;
-<<<<<<< HEAD
-	}
-}
-
-void reduceProbability()
-{
-	srand(time(NULL)-777);
-
-	while (fruitX == width-1 || fruitX == 0 || fruitY == height-1 || fruitY == 0 ) {
-
-		int i = rand();
-
-		if ((i % 6) == 0)
-			break;
-		else {
-			fruitX 	= rand() % width;
-			fruitY 	= rand() % height;
-		}
-=======
->>>>>>> work
 	}
 }
 
@@ -515,10 +425,6 @@ void reduceProbability()
 
 void fruity()
 {
-<<<<<<< HEAD
-	srand(time(NULL));
-	// Generate fruit.
-=======
 	/*
 	 * Generate new fruit placements, if they occur on the screen border,
 	 * run a further  rand command to decide whether or not to leave them
@@ -530,7 +436,6 @@ void fruity()
 	 */
 
 	srand(time(NULL));
->>>>>>> work
 	score 	+= 10;
 	fruitX 	= rand() % width;
 	fruitY 	= rand() % height;
@@ -538,10 +443,6 @@ void fruity()
 		reduceProbability();
 	}
 
-<<<<<<< HEAD
-	// Tail growth.
-	nTail++;
-=======
 	/*
 	 * Tail growth.
 	 */
@@ -551,7 +452,6 @@ void fruity()
 	/*
 	 * Increase snakes speed.
 	 */
->>>>>>> work
 
 	if (score % 50 == 0)
 		speedDelay = speedDelay - 3000;
@@ -576,11 +476,6 @@ void endGame()
 		else if (y == -1)
 			y = height-1;
 
-<<<<<<< HEAD
-		//x = width/2;
-		//y = height/2;
-=======
->>>>>>> work
 	} else 
 		gameOver = 1;
 
@@ -619,21 +514,6 @@ void Logic()
 	tail[0][0] = y;
 	tail[0][1] = x;
 
-<<<<<<< HEAD
-	/*
-	 * Decide the correct gliph, for the snakes cornering.
-	 *
-	 * 1	ACS_HLINE
-	 * 2	ACS_VLINE
-	 * 3	ACS_ULCORNER
-	 * 4	ACS_URCORNER
-	 * 5	ACS_LRCORNER
-	 * 6	ACS_LLCORNER
-	 *
-	 */
-
-=======
->>>>>>> work
 	if 	((dir == dir2) && (dir == 'R' || dir == 'L'))
 		tail[0][2] = 1;
 	else if	((dir == dir2) && (dir == 'U' || dir == 'D'))
@@ -646,10 +526,6 @@ void Logic()
 		tail[0][2] = 5;
 	else if	((dir == 'U' && dir2 == 'L') || (dir == 'R' && dir2 == 'D'))
 		tail[0][2] = 6;
-<<<<<<< HEAD
-
-=======
->>>>>>> work
 
 	for (int i = 1; i < nTail; i++) {
 
@@ -664,13 +540,10 @@ void Logic()
 		prevDir    =  prev2Dir;
 	}
 
-<<<<<<< HEAD
-=======
 	/*
 	 * Move the snakes head.
 	 */
 
->>>>>>> work
 	switch (dir)
 	{
 		case 'L':
@@ -769,12 +642,12 @@ void Exit()
 	endwin();
 }
 
+/*
+ * Program menu.
+ */
+
 void Menu()
 {
-<<<<<<< HEAD
-	//werase(gameWin);
-=======
->>>>>>> work
 	erase();
 	mvprintw((height/2)-2, (width/2)-16,
 			"Welcome to Snake Dungeons");
