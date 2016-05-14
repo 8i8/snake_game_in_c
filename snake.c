@@ -14,14 +14,15 @@ static int gameOver;
 static int imortal;
 static int width;
 static int height;
-static int ticker;
 static int x, y, fruitX, fruitY, score;
-//static int tailX[100], tailY[100];
-static int tail[100][2];
+static int tail[100][3]= {{0},{0}};
 static int nTail;
 static int speedDelay;
 static char dir;
-static char prevDir;
+
+static int ticker;
+static int debug;
+static int step;
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
  *  Setup
@@ -73,57 +74,60 @@ void Start()
  *  Draw
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-void drawTail(int* i, int* j)
+void drawTail(int* j, int* i)
 {
 	for (int k = 0; k < nTail; k++) {
 
-		//if (*i != 0 && tailX[k] == *i && tailY[k] == *j) {
-		if (*i != 0 && tail[k][0] == *i && tail[k][1] == *j) {
+		if (*j != 0 && *i != 0 && tail[k][0] == *j && tail[k][1] == *i) {
+			//mvwaddch(gameWin, *j, *i, 'o');
+			switch (tail[k][2]) {
 
-			switch (dir)
-			{
-				case 'L':
-					if 	(prevDir == 'L')
-						mvwaddch(gameWin, *j, *i, ACS_HLINE);
-					else if	(prevDir == 'S')
-						mvwaddch(gameWin, *j, *i, ACS_HLINE);
-					else if	(prevDir == 'U')
-						mvwaddch(gameWin, *j, *i, ACS_URCORNER);
-					else if (prevDir == 'D')
-						mvwaddch(gameWin, *j, *i, ACS_LRCORNER);
-					break;
-				case 'R':
-					if 	(prevDir == 'S')
-						mvwaddch(gameWin, *j, *i, ACS_HLINE);
-					else if	(prevDir == 'R')
-						mvwaddch(gameWin, *j, *i, ACS_HLINE);
-					else if	(prevDir == 'U')
-						mvwaddch(gameWin, *j, *i, ACS_ULCORNER);
-					else if (prevDir == 'D')
-						mvwaddch(gameWin, *j, *i, ACS_LLCORNER);
-					break;
-				case 'U':
-					if 	(prevDir == 'L')
-						mvwaddch(gameWin, *j, *i, ACS_LLCORNER);
-					else if	(prevDir == 'R')
-						mvwaddch(gameWin, *j, *i, ACS_LRCORNER);
-					else if	(prevDir == 'U')
-						mvwaddch(gameWin, *j, *i, ACS_VLINE);
-					else if (prevDir == 'S')
-						mvwaddch(gameWin, *j, *i, ACS_VLINE);
-					break;
-				case 'D':
-					if 	(prevDir == 'L')
-						mvwaddch(gameWin, *j, *i, ACS_ULCORNER);
-					else if	(prevDir == 'R')
-						mvwaddch(gameWin, *j, *i, ACS_URCORNER);
-					else if	(prevDir == 'S')
-						mvwaddch(gameWin, *j, *i, ACS_VLINE);
-					else if (prevDir == 'D')
-						mvwaddch(gameWin, *j, *i, ACS_VLINE);
-					break;
-				default:
-					break;
+			case 'L':
+				if 	(tail[k][2] == 'L') {
+					mvwaddch(gameWin, *j, *i, ACS_HLINE);
+				}
+				else if	(tail[k][2] == 'U') {
+					mvwaddch(gameWin, *j, *i, ACS_URCORNER);
+				}
+				else if (tail[k][2] == 'D') {
+					mvwaddch(gameWin, *j, *i, ACS_LRCORNER);
+				}
+				break;
+			case 'R':
+				if	(tail[k][2] == 'R') {
+					mvwaddch(gameWin, *j, *i, ACS_HLINE);
+				}
+				else if	(tail[k][2] == 'U') {
+					mvwaddch(gameWin, *j, *i, ACS_ULCORNER);
+				}
+				else if (tail[k][2] == 'D') {
+					mvwaddch(gameWin, *j, *i, ACS_LLCORNER);
+				}
+				break;
+			case 'U':
+				if 	(tail[k][2] == 'L') {
+					mvwaddch(gameWin, *j, *i, ACS_LLCORNER);
+				}
+				else if	(tail[k][2] == 'R') {
+					mvwaddch(gameWin, *j, *i, ACS_LRCORNER);
+				}
+				else if	(tail[k][2] == 'U') {
+					mvwaddch(gameWin, *j, *i, ACS_VLINE);
+				}
+				break;
+			case 'D':
+				if 	(tail[k][2] == 'L') {
+					mvwaddch(gameWin, *j, *i, ACS_ULCORNER);
+				}
+				else if	(tail[k][2] == 'R') {
+					mvwaddch(gameWin, *j, *i, ACS_URCORNER);
+				}
+				else if (tail[k][2] == 'D') {
+					mvwaddch(gameWin, *j, *i, ACS_VLINE);
+				}
+				break;
+			default:
+				break;
 			}
 		}
 	}
@@ -145,7 +149,7 @@ void Draw()
 				mvwprintw(gameWin, j, i, "F");
 
 			else
-				drawTail(&i, &j);
+				drawTail(&j, &i);
 		}
 	}
 
@@ -159,8 +163,41 @@ void Draw()
 }
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
- *  Logic
+ *  Debuging
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+void debugSwitch()
+{
+	if (debug == 0) {
+		debug = 1;
+		height-=10;
+		delwin(gameWin);
+		gameWin = newwin(height, width, 0, 0);
+		clear();
+		wrefresh(gameWin);
+		refresh();
+	} else {
+		debug = 0;
+		height+=10;
+		delwin(gameWin);
+		gameWin = newwin(height, width, 0, 0);
+		clear();
+		wrefresh(gameWin);
+		refresh();
+	}
+}
+
+void stepMode()
+{
+	if (step == 0){
+		nodelay(stdscr, false);
+		step = 1;
+	} else {
+		nodelay(stdscr, true);
+		step = 0;
+	}
+}
+
 
 void superpower()
 {
@@ -169,6 +206,36 @@ void superpower()
 	else
 		imortal = 0;
 }
+
+void debugTail()
+{
+	if (debug == 1) {
+		if (y > height-10)
+			y = (height-10)/2;
+		if (fruitY > height-10)
+			fruitY = (height-10)/2;
+		for (int i = 0; i < nTail; i++)	{
+			mvprintw(height, 14, "y = %2.d, x = %2.d, dir = %2.d.\n", y, x, dir);
+			if 	(i < 10)
+				mvprintw(height+1+i,    14,  "y = %2.d, x = %2.d, dir = %2.d.\n", tail[i][0], tail[i][1], tail[i][2]);
+			else if (i >= 10 && i <= 20)
+				mvprintw(height+1+i-10, 44,  "y = %2.d, x = %2.d, dir = %2.d.\n", tail[i][0], tail[i][1], tail[i][2]);
+			else if (i >= 20 && i <= 20)
+				mvprintw(height+1+i-10, 74,  "y = %2.d, x = %2.d, dir = %2.d.\n", tail[i][0], tail[i][1], tail[i][2]);
+			else if (i >= 30 && i <= 30)
+				mvprintw(height+1+i-10, 104, "y = %2.d, x = %2.d, dir = %2.d.\n", tail[i][0], tail[i][1], tail[i][2]);
+			else if (i >= 40 && i <= 40)
+				mvprintw(height+1+i-10, 134, "y = %2.d, x = %2.d, dir = %2.d.\n", tail[i][0], tail[i][1], tail[i][2]);
+			else if (i >= 50 && i <= 50)
+				mvprintw(height+1+i-10, 164, "y = %2.d, x = %2.d, dir = %2.d.\n", tail[i][0], tail[i][1], tail[i][2]);
+				refresh();
+		}
+	}
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
+ *  Logic
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 void keys(int* c)
 {
@@ -184,14 +251,16 @@ void keys(int* c)
 		*c = 5;
 	else if  (*c == 'i')
 		*c = 6;
+	else if  (*c == 'd')
+		*c = 7;
+	else if  (*c == 's')
+		*c = 8;
 }
 
 void Input()
 {
 	int c = getch();
 	keys(&c);
-
-	prevDir = dir;
 
 	switch (c) {
 
@@ -223,6 +292,12 @@ void Input()
 	case 6:
 		superpower();
 		break;
+	case 7:
+		debugSwitch();
+		break;
+	case 8:
+		stepMode();
+		break;
 	}
 }
 
@@ -233,11 +308,13 @@ void Input()
 void fruity()
 {
 	srand(time(NULL));
-
+	// Generate fruit.
 	score 	+= 10;
 	fruitX 	= rand() % width;
 	fruitY 	= rand() % height;
-	nTail 	= nTail + 1;
+
+	// Tail growth.
+	nTail++;
 
 	// Speed up
 	if (score % 50 == 0)
@@ -264,45 +341,26 @@ void Logic()
 	 * Snakes tail.
 	 */
 
-	int prevX = tail[0][0];
-	int prevY = tail[0][1];
+	int prevY   =  tail[0][0];
+	int prevX   =  tail[0][1];
+	int prevDir =  tail[0][2];
+	int prev2X, prev2Y, prev2Dir;
 
-	//int prevX  =  tailX[0];
-	//int prevY  =  tailY[0];
-	int prev2X, prev2Y;
-
-	//if (ticker == 0) {
-
-	//	tail[0][0][1] = -1;
-	//	tail[0][0][2] = -1;
-
-	//	//prevY 	= -1;
-	//	//prev2Y 	= -1;
-	//	//prevX 	= -1;
-	//	//prev2X 	= -1;
-	//}
-
-	tail[0][0] = x;
-	tail[0][1] = y;
-	
-	//tailX[0] = x;
-	//tailY[0] = y;
+	tail[0][0] = y;
+	tail[0][1] = x;
+	tail[0][2] = dir;
 
 	for (int i = 1; i < nTail; i++) {
 
-		prev2X     =  tail[i][0];
-		prev2Y     =  tail[i][1];
-		tail[i][0] =  prevX;
-		tail[i][1] =  prevY;
-		prevX	   =  prev2X;
+		prev2Y     =  tail[i][0];
+		prev2X     =  tail[i][1];
+		prev2Dir   =  tail[i][2];
+		tail[i][0] =  prevY;
+		tail[i][1] =  prevX;
+		tail[i][2] =  prevDir;
 		prevY	   =  prev2Y;
-		
-		//prev2X   =  tailX[i];
-		//prev2Y   =  tailY[i];
-		//tailX[i] =  prevX;
-		//tailY[i] =  prevY;
-		//prevX    =  prev2X;
-		//prevY    =  prev2Y;
+		prevX	   =  prev2X;
+		prevDir    =  prev2Dir;
 	}
 
 	/*
@@ -357,14 +415,14 @@ void Logic()
 	 */
 
 	for (int i = 0; i < nTail; i++)
-		if (tail[i][0] == x && tail[i][1] == y)
+		if (tail[i][0] == y && tail[i][1] == x)
 			endGame();
 
 	/*
 	 * Get fruity here.
 	 */
 
-	if (x == fruitX && y == fruitY)
+	if (y == fruitY && x == fruitX)
 		fruity();
 }
 
@@ -383,6 +441,7 @@ void Play()
 		Logic();
 		usleep(speedDelay);
 		ticker++;
+		debugTail();
 	}
 }
 
