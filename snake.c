@@ -215,20 +215,29 @@ void debugTail()
 		if (fruitY > height-10)
 			fruitY = (height-10)/2;
 		for (int i = 0; i < nTail; i++)	{
+
 			mvprintw(height, 14, "y = %2.d, x = %2.d, dir = %2.d.\n", y, x, dir);
-			if 	(i < 10)
-				mvprintw(height+1+i,    14,  "y = %2.d, x = %2.d, dir = %2.d.\n", tail[i][0], tail[i][1], tail[i][2]);
+
+			if (i < 10)
+				mvprintw(height+1+i,    14,	"y = %2.d, x = %2.d, dir = %2.d.\n",
+						tail[i][0], tail[i][1], tail[i][2]);
 			else if (i >= 10 && i <= 20)
-				mvprintw(height+1+i-10, 44,  "y = %2.d, x = %2.d, dir = %2.d.\n", tail[i][0], tail[i][1], tail[i][2]);
+				mvprintw(height+1+i-10, 44,	"y = %2.d, x = %2.d, dir = %2.d.\n",
+						tail[i][0], tail[i][1], tail[i][2]);
 			else if (i >= 20 && i <= 20)
-				mvprintw(height+1+i-10, 74,  "y = %2.d, x = %2.d, dir = %2.d.\n", tail[i][0], tail[i][1], tail[i][2]);
+				mvprintw(height+1+i-10, 74,	"y = %2.d, x = %2.d, dir = %2.d.\n",
+						tail[i][0], tail[i][1], tail[i][2]);
 			else if (i >= 30 && i <= 30)
-				mvprintw(height+1+i-10, 104, "y = %2.d, x = %2.d, dir = %2.d.\n", tail[i][0], tail[i][1], tail[i][2]);
+				mvprintw(height+1+i-10, 104,	"y = %2.d, x = %2.d, dir = %2.d.\n", 
+						tail[i][0], tail[i][1], tail[i][2]);
 			else if (i >= 40 && i <= 40)
-				mvprintw(height+1+i-10, 134, "y = %2.d, x = %2.d, dir = %2.d.\n", tail[i][0], tail[i][1], tail[i][2]);
+				mvprintw(height+1+i-10, 134, 	"y = %2.d, x = %2.d, dir = %2.d.\n", 
+						tail[i][0], tail[i][1], tail[i][2]);
 			else if (i >= 50 && i <= 50)
-				mvprintw(height+1+i-10, 164, "y = %2.d, x = %2.d, dir = %2.d.\n", tail[i][0], tail[i][1], tail[i][2]);
-				refresh();
+				mvprintw(height+1+i-10, 164, 	"y = %2.d, x = %2.d, dir = %2.d.\n", 
+						tail[i][0], tail[i][1], tail[i][2]);
+
+			refresh();
 		}
 	}
 }
