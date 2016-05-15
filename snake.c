@@ -9,7 +9,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define START_LENGTH	150
+#define START_LENGTH	5
+#define GROW		10
 
 static WINDOW* gameWin;
 static int gameOver;
@@ -557,7 +558,7 @@ void Logic()
 	 * Set the snakes head size to grow at a specific length.
 	 */
 
-	if (nTail >= 20)
+	if (nTail >= GROW)
 		grown = 1;
 
 	/*
