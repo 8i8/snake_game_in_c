@@ -9,11 +9,10 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define START_LENGTH	25
+#define START_LENGTH	150
 
 static WINDOW* gameWin;
 static int gameOver;
-static int imortal;
 static int maxWidth;
 static int maxHeight;
 static int width;
@@ -25,6 +24,8 @@ static int speedDelay;
 static char dir;
 static char dir2;
 
+static int grown;
+static int imortal;
 static int ticker;
 static int debug;
 static int step;
@@ -91,116 +92,6 @@ void Start()
 		tail[i][1] = x-(i);
 		tail[i][2] = 'R';
 	}
-}
-
-/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
- *  Draw
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-
-void drawTail(int* j, int* i)
-{
-	for (int k = 0; k < nTail; k++) {
-
-		if (*j != 0 && *i != 0 && tail[k][0] == *j && tail[k][1] == *i) {
-
-			/*
-			 * Print the correct glyph for the snakes body.
-			 *
-			 * 1	ACS_HLINE
-			 * 2	ACS_VLINE
-			 * 3	ACS_ULCORNER
-			 * 4	ACS_URCORNER
-			 * 5	ACS_LRCORNER
-			 * 6	ACS_LLCORNER
-			 *
-			 */
-
-			switch (tail[k][2]) {
-
-			case 1:
-				mvwaddch(gameWin, *j, *i, ACS_HLINE);
-				break;
-			case 2:
-				mvwaddch(gameWin, *j, *i, ACS_VLINE);
-				break;
-			case 3:
-				mvwaddch(gameWin, *j, *i, ACS_ULCORNER);
-				break;
-			case 4:
-				mvwaddch(gameWin, *j, *i, ACS_URCORNER);
-				break;
-			case 5:
-				mvwaddch(gameWin, *j, *i, ACS_LRCORNER);
-				break;
-			case 6:
-				mvwaddch(gameWin, *j, *i, ACS_LLCORNER);
-				break;
-			default:
-				break;
-			}
-		}
-	}
-}
-
-void Draw()
-{
-	werase(gameWin);
-
-	/*
-	 * Borders
-	 */
-
-	for (int i = 1; i < width-1; i++)
-		mvwaddch(gameWin, 0, i, ACS_HLINE);
-	for (int i = 1; i < width-1; i++)
-		mvwaddch(gameWin, height-1, i, ACS_HLINE);
-	for (int i = 1; i < height-1; i++)
-		mvwaddch(gameWin, i, 0, ACS_VLINE);
-	for (int i = 1; i < height-1; i++)
-		mvwaddch(gameWin, i, width-1, ACS_VLINE);
-
-	/*
-	 * Corners
-	 */
-
-	mvwaddch(gameWin, 0, 0, ACS_ULCORNER);
-	mvwaddch(gameWin, 0, width-1, ACS_URCORNER);
-	mvwaddch(gameWin, height-1, 0, ACS_LLCORNER);
-	mvwaddch(gameWin, height-1, width-1, ACS_LRCORNER);
-
-	/*
-	 * Objects on the matrix
-	 */
-
-	for (int j = 0; j < height; j++) {
-
-		for (int i = 0; i < width; i++) {
-
-			if (j == y && i == x)
-				mvwaddch(gameWin, j, i, ACS_DIAMOND);
-
-			else if (j == fruitY && i == fruitX)
-				mvwprintw(gameWin, j, i, "F");
-
-			else
-				drawTail(&j, &i);
-		}
-	}
-
-	/*
-	 * Set the score
-	 */
-
-	mvprintw(height, 2, "Score: %d", score);
-
-	/*
-	 * Debugging
-	 */
-
-	if (imortal == 1)
-		mvwaddch(gameWin, height, width-2, 'I');
-
-	wrefresh(gameWin);
 }
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
@@ -276,46 +167,147 @@ void superpower()
 
 void debugTail()
 {
-	WINDOW* pad;
-
-	pad = subpad(gameWin, height , width, height+2, 0);
-	touchwin(pad);
-			prefresh(pad, 0, 0, height+2, 0, 9, width);
-	
 	if (debug == 1) {
-		mvwprintw(pad, 0, 15, "y = %-3.d x = %-3.d dir = %-3.d\n", y, x, dir);
-	if (imortal == 1)
-		mvwprintw(pad, 0, width-2, "I", y, x, dir);
+		mvwprintw(gameWin, height+1, 4, "  y: %-3.d", y);
+		mvwprintw(gameWin, height+2, 4, "  x: %-3.d", x);
+		mvwprintw(gameWin, height+3, 4, "dir: %c\n", dir);
 
 		for (int i = 0; i < nTail; i++)	{
 
 
 			if (i < 10) {
-				mvwprintw(pad, i, 15,	 "y = %-3d x = %-3d dir = %-3d\n",
+				mvwprintw(gameWin, height+i, 15,    "y = %-3d x = %-3d d = %-3d\n",
 							tail[i][0], tail[i][1], tail[i][2]);
 			} else if (i >= 10 && i <= 19) {
-				mvwprintw(pad, i-10, 45, "y = %-3d x = %-3d dir = %-3d\n",
+				mvwprintw(gameWin, height+i-10, 40, "y = %-3d x = %-3d d = %-3d\n",
 							tail[i][0], tail[i][1], tail[i][2]);
 			} else if (i >= 20 && i <= 29) {
-				mvwprintw(pad, i-20, 75, "y = %-3d x = %-3d dir = %-3d\n",
+				mvwprintw(gameWin, height+i-20, 65, "y = %-3d x = %-3d d = %-3d\n",
 							tail[i][0], tail[i][1], tail[i][2]);
 			} else if (i >= 30 && i <= 39) {
-				mvwprintw(pad, i-30, 105,"y = %-3d x = %-3d dir = %-3d\n",
+				mvwprintw(gameWin, height+i-30, 90,"y = %-3d x = %-3d d = %-3d\n",
 							tail[i][0], tail[i][1], tail[i][2]);
 			} else if (i >= 40 && i <= 49) {
-				mvwprintw(pad, i-40, 135,"y = %-3d x = %-3d dir = %-3d\n",
+				mvwprintw(gameWin, height+i-40, 115,"y = %-3d x = %-3d d = %-3d\n",
 							tail[i][0], tail[i][1], tail[i][2]);
 			} else if (i >= 50 && i <= 59) {
-				mvwprintw(pad, i-50, 165, "y = %-3d x = %-3d dir = %-3d\n",
+				mvwprintw(gameWin, height+i-50, 140, "y = %-3d x = %-3d d = %-3d\n",
 							tail[i][0], tail[i][1], tail[i][2]);
 			}
 
-			touchwin(pad);
-			prefresh(pad, 0, 0, height+2, 0, 9, width);
-			wrefresh(gameWin);
-			//Pause();
+		}
+		
+	if (imortal == 1)
+		mvwaddch(gameWin, height, width-2, 'I');
+
+	}
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
+ *  Draw
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+void drawTail(int* j, int* i)
+{
+	for (int k = 0; k < nTail; k++) {
+
+		if (*j != 0 && *i != 0 && tail[k][0] == *j && tail[k][1] == *i) {
+
+			/*
+			 * Print the correct glyph for the snakes body.
+			 */
+
+			switch (tail[k][2]) {
+
+			case 1:
+				mvwaddch(gameWin, *j, *i, ACS_HLINE);
+				break;
+			case 2:
+				mvwaddch(gameWin, *j, *i, ACS_VLINE);
+				break;
+			case 3:
+				mvwaddch(gameWin, *j, *i, ACS_ULCORNER);
+				break;
+			case 4:
+				mvwaddch(gameWin, *j, *i, ACS_URCORNER);
+				break;
+			case 5:
+				mvwaddch(gameWin, *j, *i, ACS_LRCORNER);
+				break;
+			case 6:
+				mvwaddch(gameWin, *j, *i, ACS_LLCORNER);
+				break;
+			default:
+				break;
+			}
 		}
 	}
+}
+
+void Draw()
+{
+	werase(gameWin);
+
+	/*
+	 * Borders
+	 */
+
+	for (int i = 1; i < width-1; i++)
+		mvwaddch(gameWin, 0, i, ACS_HLINE);
+	for (int i = 1; i < width-1; i++)
+		mvwaddch(gameWin, height-1, i, ACS_HLINE);
+	for (int i = 1; i < height-1; i++)
+		mvwaddch(gameWin, i, 0, ACS_VLINE);
+	for (int i = 1; i < height-1; i++)
+		mvwaddch(gameWin, i, width-1, ACS_VLINE);
+
+	/*
+	 * Corners
+	 */
+
+	mvwaddch(gameWin, 0, 0, ACS_ULCORNER);
+	mvwaddch(gameWin, 0, width-1, ACS_URCORNER);
+	mvwaddch(gameWin, height-1, 0, ACS_LLCORNER);
+	mvwaddch(gameWin, height-1, width-1, ACS_LRCORNER);
+
+	/*
+	 * Objects on the matrix
+	 */
+
+	for (int j = 0; j < height; j++) {
+
+		for (int i = 0; i < width; i++) {
+
+			if (j == y && i == x && (grown == 1))
+				mvwaddch(gameWin, j, i, 'O');
+			else if	(j == y && i == x && (grown == 0))
+				mvwaddch(gameWin, j, i, 'o');
+
+			else if (j == fruitY && i == fruitX)
+				mvwaddch(gameWin, j, i, 'X');
+
+			else
+				drawTail(&j, &i);
+		}
+	}
+
+	/*
+	 * Set the score
+	 */
+
+	mvprintw(height, 2, "Score: %d", score);
+
+	/*
+	 * Indicate debugging with deathless death.
+	 */
+
+	if (imortal == 1)
+		mvwaddch(gameWin, height, width-2, 'I');
+
+	if (debug == 1)
+		debugTail();
+
+	wrefresh(gameWin);
 }
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
@@ -503,7 +495,6 @@ void Logic()
 	 * 	4	ACS_URCORNER
 	 * 	5	ACS_LRCORNER
 	 * 	6	ACS_LLCORNER
-	 *
 	 */
 
 	int prevY   =  tail[0][0];
@@ -561,6 +552,13 @@ void Logic()
 		default:
 			break;
 	}
+
+	/*
+	 * Set the snakes head size to grow at a specific length.
+	 */
+
+	if (nTail >= 20)
+		grown = 1;
 
 	/*
 	 * Game boundary; Through the walls or total destruction? If fruit is
@@ -626,7 +624,6 @@ void Play()
 		Logic();
 		usleep(speedDelay);
 		ticker++;
-		debugTail();
 	}
 }
 
