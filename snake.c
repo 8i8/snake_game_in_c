@@ -10,7 +10,7 @@
 #include <time.h>
 
 #define START_LENGTH	6
-#define GROW		12
+#define GROW		7
 
 static WINDOW* gameWin;
 static int gameOver;
@@ -19,7 +19,7 @@ static int maxHeight;
 static int width;
 static int height;
 static int x, y, fruitX, fruitY, score;
-static int tail[200][3]= {{0},{0}};
+static int tail[200][3] = {{0},{0}};
 static int nTail;
 static int speedDelay;
 static char dir;
@@ -44,7 +44,7 @@ void gameMode()
 	nodelay(stdscr, true);		// Do not wait for getch()
 }
 
-void SetSreenSize()
+void SetScreenSize()
 {
 	static int hOffset;
 	static int wOffset;
@@ -52,9 +52,6 @@ void SetSreenSize()
 	/*
 	 * Check for screen size changes.
 	 */
-
-	hOffset = maxHeight;
-	wOffset = maxWidth;
 
 	getmaxyx(stdscr, maxHeight, maxWidth);
 
@@ -77,12 +74,21 @@ void SetSreenSize()
 			fruitY 	= rand() % height;
 		}
 	}
+
+	/*
+	 * Set these values at the end of the routine so that the routine check
+	 * is faster during the program loop.
+	 */
+
+	hOffset = maxHeight;
+	wOffset = maxWidth;
+
 }
 
 void SetupCurses()
 {
 	initscr();
-	SetSreenSize();
+	SetScreenSize();
 	gameWin = newwin(maxHeight, maxWidth, 0, 0);
 	keypad(stdscr, true);		// Use advanced keyboard functionality.
 	gameMode();
@@ -122,8 +128,8 @@ void Start()
 	nTail = START_LENGTH;
 
 	for (int i = 0; i < nTail; i++) {
-		tail[i][0] = y;
-		tail[i][1] = x-(i);
+		tail[i][0] = 0;
+		tail[i][1] = 0;
 		tail[i][2] = 'R';
 	}
 }
@@ -150,12 +156,12 @@ void debugSwitch()
 	if (debug == 0) {
 		debug = 1;
 		resize = 1;
-		SetSreenSize();
+		SetScreenSize();
 		wrefresh(gameWin);
 	} else {
 		debug = 0;
 		resize = 1;
-		SetSreenSize();
+		SetScreenSize();
 		wrefresh(gameWin);
 	}
 }
@@ -459,7 +465,6 @@ void fruity()
 		if (fruitY == tail[i][0] && fruitX == tail[i][1])
 			fruity();
 
-
 	/*
 	 * Tail growth.
 	 */
@@ -484,11 +489,8 @@ void endGame()
 {
 	if (imortal == 1) {
 
-		if (x == width) {
+		if (x == width)
 			x = 0;
-			y++;
-
-		}
 		else if	(x == -1)
 			x = width-1;
 		else if	(y == height)	
@@ -649,7 +651,7 @@ void Play()
 
 	while (gameOver == 0) {
 
-		SetSreenSize();
+		SetScreenSize();
 		Draw();
 		Input();
 		Logic();
