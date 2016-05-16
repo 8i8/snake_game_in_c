@@ -32,20 +32,36 @@ static int debug;
 static int resize;
 static int step;
 
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ * 
+ *  The snake
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+typedef struct node {
+
+	int y;
+	int x;
+	int type;
+	struct node* next;
+
+} sTail;
+
+static sTail* root;
+static sTail* counter;
+
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
  *  Setup
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-void gameMode()
-{
+void gameMode() {
+
 	noecho();			// Hide typing.
 	cbreak();			// disable line buffering.
 	curs_set(false);		// No visible cursor.
 	nodelay(stdscr, true);		// Do not wait for getch()
 }
 
-void SetScreenSize()
-{
+void SetScreenSize() {
+
 	static int hOffset;
 	static int wOffset;
 
@@ -197,8 +213,8 @@ void superpower()
  * Display a table of the tail array data.
  */
 
-void arrayTable(int i, int j, int h, int m, int w)
-{
+void arrayTable(int i, int j, int h, int m, int w) {
+
 	if (i >= j*h && i <= (j+1)*h && maxWidth > m+2*w) {
 		mvwprintw(gameWin, height+i-j*h, m+j*w, "y:%-4dx:%-4dd:%-3d\n",
 				tail[i][0], tail[i][1], tail[i][2]);
@@ -223,7 +239,6 @@ void debugTail()
 		mvwprintw(gameWin, height+3, 4, "dir: %c\n", dir);
 
 		for (int i = 0; i < nTail; i++)	{
-
 			for (int j = 0; j < (width-m)/w; j++)
 				arrayTable(i, j, h, m, w);
 		}
@@ -237,7 +252,6 @@ void debugTail()
 void drawTail(int* j, int* i)
 {
 	for (int k = 0; k < nTail; k++) {
-
 		if (*j != 0 && *i != 0 && tail[k][0] == *j && tail[k][1] == *i) {
 
 			/*
@@ -271,8 +285,20 @@ void drawTail(int* j, int* i)
 	}
 }
 
-void Draw()
-{
+void Draw() {
+
+	/*
+	 * TODO this screen wipe needs to be replaced with a localised redraw
+	 * of only the new snake segment, and that which has been removed from
+	 * the end of the tail. The global screen refresh at the end of the
+	 * function needs to be local, perhaps the entire section split into
+	 * two functions; One for the initial draw and the other for local game
+	 * movement.
+	 *
+	 * If removed at this time the tail remains infinitly visable on
+	 * screen.
+	 */
+
 	werase(gameWin);
 
 	/*
@@ -302,17 +328,13 @@ void Draw()
 	 */
 
 	for (int j = 0; j < height; j++) {
-
 		for (int i = 0; i < width; i++) {
-
 			if (j == y && i == x && (grown == 1))
 				mvwaddch(gameWin, j, i, 'O');
 			else if	(j == y && i == x && (grown == 0))
 				mvwaddch(gameWin, j, i, 'o');
-
 			else if (j == fruitY && i == fruitX)
 				mvwaddch(gameWin, j, i, 'X');
-
 			else
 				drawTail(&j, &i);
 		}
@@ -503,13 +525,37 @@ void endGame()
 
 }
 
+void setTail(int* type, int* y, int* x)
+{
+	/*
+	 * Set the snakes tail.
+	 */
+
+	switch (*type)
+	{
+		case 'L':
+			x--;
+			break;
+		case 'R':
+			x++;
+			break;
+		case 'U':
+			y--;
+			break;
+		case 'D':
+			y++;
+			break;
+		default:
+			break;
+	}
+}
+
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
  *  Logic main
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 void Logic()
 {
-
 	/*
 	 * Snakes tail, shift the details of each tail segment back one place
 	 * in the array, the second dimension of the array holds three values.
@@ -527,6 +573,12 @@ void Logic()
 	 * 	5	ACS_LRCORNER
 	 * 	6	ACS_LLCORNER
 	 */
+
+	root = malloc(sizeof(struct node));
+	root->next = 0;
+	counter = root;
+
+	//root->x = 
 
 	int prevY   =  tail[0][0];
 	int prevX   =  tail[0][1];
