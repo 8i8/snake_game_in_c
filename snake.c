@@ -80,8 +80,8 @@ void SetScreenSize()
 	}
 
 	/*
-	 * Set these values at the end of the routine so that the routine check
-	 * is faster during the program loop.
+	 * Set these values at the end of the function, that the routine check
+	 * is faster during program loop.
 	 */
 
 	hOffset = maxHeight;
