@@ -9,8 +9,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define START_LENGTH	6
-#define GROW		7
+#define START_LENGTH		(width*height/300)
+#define GROW			((width*height/300)+1)
 
 static WINDOW* gameWin;
 static int gameOver;
@@ -574,9 +574,9 @@ void Logic()
 	 * 	6	ACS_LLCORNER
 	 */
 
-	root = malloc(sizeof(struct node));
-	root->next = 0;
-	counter = root;
+	//root = malloc(sizeof(struct node));
+	//root->next = 0;
+	//counter = root;
 
 	//root->x = 
 
