@@ -48,6 +48,20 @@ typedef struct node {
 static sTail* root;
 static sTail* counter;
 
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ * 
+ *  Memory alloc
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+void makeTail()
+{
+	root = malloc(sizeof(struct node));
+	root->next = 0;
+	counter = root;
+
+	//root->x = 
+}
+
+
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
  *  Setup
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
@@ -573,12 +587,6 @@ void Logic()
 	 * 	5	ACS_LRCORNER
 	 * 	6	ACS_LLCORNER
 	 */
-
-	//root = malloc(sizeof(struct node));
-	//root->next = 0;
-	//counter = root;
-
-	//root->x = 
 
 	int prevY   =  tail[0][0];
 	int prevX   =  tail[0][1];
