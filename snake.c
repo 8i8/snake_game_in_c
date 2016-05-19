@@ -53,7 +53,6 @@ static sTail* counter;
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 void gameMode() {
-
 	noecho();			// Hide typing.
 	cbreak();			// disable line buffering.
 	curs_set(false);		// No visible cursor.
@@ -98,7 +97,6 @@ void SetScreenSize() {
 
 	hOffset = maxHeight;
 	wOffset = maxWidth;
-
 }
 
 void SetupCurses()
@@ -203,10 +201,7 @@ void stepMode()
 
 void superpower()
 {
-	if (imortal == 0)
-		imortal = 1;
-	else
-		imortal = 0;
+	imortal == 0 ? imortal == 1 : imortal == 0;
 }
 
 /*
