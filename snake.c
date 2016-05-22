@@ -215,7 +215,7 @@ void stepMode()
 
 void superpower()
 {
-	imortal == 0 ? imortal == 1 : imortal == 0;
+	imortal == 0 ? (imortal = 1) : (imortal = 0);
 }
 
 /*
