@@ -10,11 +10,7 @@
 #include <time.h>
 
 #define START_LENGTH	6
-<<<<<<< HEAD
-#define GROW		12
-=======
 #define GROW		7
->>>>>>> work
 
 static WINDOW* gameWin;
 static int gameOver;
