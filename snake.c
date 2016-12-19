@@ -9,8 +9,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define START_LENGTH	6
-#define GROW		7
+#define START_LENGTH	6	// Start length of the snakes tail.
+#define GROW		7	// Length at which the snakes head grows.
 
 static WINDOW* gameWin;
 static int gameOver;
@@ -182,7 +182,7 @@ void stepMode()
 }
 
 /*
- * Turn of fatality.
+ * Turn off fatality.
  */
 
 void superpower()
