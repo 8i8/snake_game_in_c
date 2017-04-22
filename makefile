@@ -1,2 +1,2 @@
 snake: snake.c
-	gcc -std=c99 -Wall -pedantic -o a.out snake.c -lncurses
+	gcc -g -std=c99 -Wall -pedantic -o snake snake.c -lncurses
