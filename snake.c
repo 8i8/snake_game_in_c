@@ -25,8 +25,6 @@
  ============================================================================
  */
 
-#define _BSD_SOURCE	// Fix for usleep
-
 #include <curses.h>
 #include <unistd.h>
 #include <stdlib.h>
