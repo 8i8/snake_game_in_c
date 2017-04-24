@@ -468,7 +468,7 @@ void fruity()
 	/*
 	 * Generate new fruit placements, if they occur on the screen border,
 	 * run a further  rand command to decide whether or not to leave them
-	 * in place.
+	 * in there.
 	 *
 	 * Border cases:
 	 *
@@ -491,21 +491,20 @@ void fruity()
 
 	if (!isSkip) {
 
-	/*
-	 * Tail growth.
-	 */
+		/*
+		 * Tail growth.
+		 */
 
 		nTail++;
 
-	/*
-	 * Increase snakes speed.
-	 */
+		/*
+		 * Increase snakes speed.
+		 */
 
 		if (score % 50 == 0)
 			speedDelay = speedDelay - 3000;
 	} else 
 		isSkip = 0;
-
 }
 
 /*
