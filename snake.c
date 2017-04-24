@@ -40,7 +40,7 @@ static int maxHeight;
 static int width;
 static int height;
 static int x, y, fruitX, fruitY, score;
-static int tail[200][3] = {{0},{0}};
+static int tail[200][3];
 static int nTail;
 static int speedDelay;
 static char dir;
@@ -228,7 +228,7 @@ void arrayTable(int i, int j, int h, int m, int w)
 
 /*
  * Precise details of the snakes tail array, displayed below the main screen
- * when initialised; the above function write from this one..
+ * when initialised; The above function is filled by this one.
  */
 
 void debugTail()
@@ -444,7 +444,7 @@ void Input()
 
 void reduceProbability()
 {
-	srand(time(NULL)-777);
+	srand(time(NULL)-1);
 
 	while (fruitX == width-1 || fruitX == 0 || fruitY == height-1 || fruitY == 0 ) {
 
@@ -474,6 +474,7 @@ void fruity()
 	 *
 	 * (fruitX == width-1 || fruitX == 0 || fruitY == height-1 || fruitY == 0 
 	 */
+	int isSkip = 0;
 
 	srand(time(NULL));
 	score 	+= 10;
@@ -483,21 +484,28 @@ void fruity()
 		reduceProbability();
 
 	for (int i = 0; i <= nTail; i++)
-		if (fruitY == tail[i][0] && fruitX == tail[i][1])
+		if (fruitY == tail[i][0] && fruitX == tail[i][1]) {
+			isSkip = 1;
 			fruity();
+		}
+
+	if (!isSkip) {
 
 	/*
 	 * Tail growth.
 	 */
 
-	nTail++;
+		nTail++;
 
 	/*
 	 * Increase snakes speed.
 	 */
 
-	if (score % 50 == 0)
-		speedDelay = speedDelay - 3000;
+		if (score % 50 == 0)
+			speedDelay = speedDelay - 3000;
+	} else 
+		isSkip = 0;
+
 }
 
 /*
