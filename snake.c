@@ -168,7 +168,7 @@ void Pause()
 
 /*
  * Fold up the bottom of the screen to reveal details of the coordinates of the
- * snakes tail, to be used for implementing modifications to the tail array
+ * snakes tail, used whilst implementing modifications to the tail array
  * behavior,
  */
 
@@ -472,14 +472,19 @@ int fruity()
 	 *
 	 * Border cases:
 	 *
-	 * (fruitX == width-1 || fruitX == 0 || fruitY == height-1 || fruitY == 0 
+	 * (fruitX == width-1 || fruitX == 0 || fruitY == height-1 || fruitY == 0)
 	 */
+
 	srand(time(NULL));
 	score 	+= 10;
 	fruitX 	= rand() % width;
 	fruitY 	= rand() % height;
 	if (fruitX == width-1 || fruitX == 0 || fruitY == height-1 || fruitY == 0 )
 		reduceProbability();
+
+	/*
+	 * If the fruit appears on the snakes tail, return 0 to run again.
+	 */
 
 	for (int i = 0; i < nTail; i++)
 		if (fruitY == tail[i][0] && fruitX == tail[i][1])
