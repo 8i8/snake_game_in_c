@@ -463,7 +463,7 @@ void reduceProbability()
  * Add to the score and replace fruit.
  */
 
-void fruity()
+int fruity()
 {
 	/*
 	 * Generate new fruit placements, if they occur on the screen border,
@@ -474,8 +474,6 @@ void fruity()
 	 *
 	 * (fruitX == width-1 || fruitX == 0 || fruitY == height-1 || fruitY == 0 
 	 */
-	int isSkip = 0;
-
 	srand(time(NULL));
 	score 	+= 10;
 	fruitX 	= rand() % width;
@@ -483,28 +481,24 @@ void fruity()
 	if (fruitX == width-1 || fruitX == 0 || fruitY == height-1 || fruitY == 0 )
 		reduceProbability();
 
-	for (int i = 0; i <= nTail; i++)
-		if (fruitY == tail[i][0] && fruitX == tail[i][1]) {
-			isSkip = 1;
-			fruity();
-		}
+	for (int i = 0; i < nTail; i++)
+		if (fruitY == tail[i][0] && fruitX == tail[i][1])
+			return 0;
 
-	if (!isSkip) {
+	/*
+	 * Tail growth.
+	 */
 
-		/*
-		 * Tail growth.
-		 */
+	nTail++;
 
-		nTail++;
+	/*
+	 * Increase snakes speed.
+	 */
 
-		/*
-		 * Increase snakes speed.
-		 */
+	if (score % 50 == 0)
+		speedDelay -= 3000;
 
-		if (score % 50 == 0)
-			speedDelay = speedDelay - 3000;
-	} else 
-		isSkip = 0;
+	return 1;
 }
 
 /*
@@ -641,7 +635,8 @@ void Logic()
 		else if (y == 0)
 			y = height-1;
 
-		fruity();
+		while(!fruity())
+			;
 
 	} else if (x == width || x == -1 || y == height || y == -1)
 
@@ -660,7 +655,8 @@ void Logic()
 	 */
 
 	if (y == fruitY && x == fruitX)
-		fruity();
+		while(!fruity())
+			;
 
 }
 
