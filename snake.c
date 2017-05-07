@@ -48,6 +48,7 @@ static char dir2;
 
 static int grown;
 static int imortal;
+static int autoSeek;
 static int ticker;
 static int debug;
 static int resize;
@@ -137,6 +138,7 @@ void Start()
 	 */
 
 	imortal		= 0;
+	autoSeek	= 0;
 	gameOver	= 0;
 
 	/*
@@ -214,6 +216,17 @@ void superpower()
 		imortal = 0;
 }
 
+/*
+ * Auto seek fruit.
+ */
+
+void autoSeeker()
+{
+	if (autoSeek == 0)
+		autoSeek = 1;
+	else
+		autoSeek = 0;
+}
 /*
  * Display a table of the tail array data.
  */
@@ -352,6 +365,9 @@ void Draw()
 	if (imortal == 1)
 		mvwaddch(gameWin, height-2, width-2, 'I');
 
+	if (autoSeek == 1)
+		mvwaddch(gameWin, height-2, width-3, 'A');
+
 	if (debug == 1)
 		debugTail();
 
@@ -385,6 +401,8 @@ void keys(int* c)
 		*c = 7;
 	else if (*c == 's')
 		*c = 8;
+	else if (*c == 'a')
+		*c = 9;
 }
 
 /*
@@ -433,6 +451,9 @@ void Input()
 		break;
 	case 8:
 		stepMode();
+		break;
+	case 9:
+		autoSeeker();
 		break;
 	}
 }
@@ -514,7 +535,7 @@ int fruity()
 
 void endGame()
 {
-	if (imortal == 1) {
+	if (imortal == 1 && autoSeek == 0) {
 
 		if (x == width)
 			x = 0;
@@ -525,7 +546,18 @@ void endGame()
 		else if (y == -1)
 			y = height-1;
 
-	} else 
+	} else if (imortal == 1 && autoSeek == 1) {
+
+		if (x == width)
+			x = 0, y = fruitY;
+		else if (x == -1)
+			x = width-1, y = fruitY;
+		else if	(y == height)	
+			y = 0, x = fruitX;
+		else if (y == -1)
+			y = height-1, x = fruitX;
+
+	} else
 		gameOver = 1;
 
 }
