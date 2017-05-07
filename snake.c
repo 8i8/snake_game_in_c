@@ -140,7 +140,7 @@ void Start()
 	gameOver	= 0;
 
 	/*
-	 * Clean the tail array, who knows who used it last!
+	 * Setup tail.
 	 */
 
 	for (int i = 0; i < nTail; i++)
@@ -476,7 +476,6 @@ int fruity()
 	 */
 
 	srand(time(NULL));
-	score 	+= 10;
 	fruitX 	= rand() % width;
 	fruitY 	= rand() % height;
 	if (fruitX == width-1 || fruitX == 0 || fruitY == height-1 || fruitY == 0 )
@@ -491,9 +490,10 @@ int fruity()
 			return 0;
 
 	/*
-	 * Tail growth.
+	 * Scored! Tail growth.
 	 */
 
+	score 	+= 10;
 	nTail++;
 
 	/*
