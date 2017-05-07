@@ -529,8 +529,6 @@ int fruity()
 
 /*
  * An endgame with a get-out clause.
- *
- * (x == width || x == -1 || y == height || y == -1)
  */
 
 void endGame()
