@@ -33,7 +33,7 @@
 #define START_LENGTH	6	// Start length of the snakes tail.
 #define GROW		7	// Length at which the snakes head grows.
 
-static WINDOW* gameWin;
+static WINDOW *gameWin;
 static int gameOver;
 static int maxWidth;
 static int maxHeight;
